@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${country.name.common} | Detalhes`,
       description: `Informações sobre ${country.name.common}`,
     };
-  } catch (error) {
+  } catch {
     return {
       title: "País não encontrado",
       description: "Detalhes do país não disponíveis",
