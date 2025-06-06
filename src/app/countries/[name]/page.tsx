@@ -1,5 +1,3 @@
-// src/app/países/[nome]/page.tsx
-
 import { Card, CardHeader, CardBody, Chip, Button, Divider, Image } from "@nextui-org/react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -34,13 +32,13 @@ async function getCountry(name: string): Promise<CountryDetail> {
 
 type Props = {
   params: {
-    nome: string;
+    name: string;
   };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const country = await getCountry(params.nome);
+    const country = await getCountry(params.name);
     return {
       title: `${country.name.common} | Detalhes`,
       description: `Informações detalhadas sobre ${country.name.common}.`,
@@ -54,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CountryDetailPage({ params }: Props) {
-  const country = await getCountry(params.nome);
+  const country = await getCountry(params.name);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
