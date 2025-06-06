@@ -17,7 +17,7 @@ interface CountryDetail {
   };
   flags: {
     svg: string;
-    alt?: string;
+    alt?: string; // Optional to match API response
   };
   capital: string[];
   population: number;
@@ -33,24 +33,29 @@ async function getCountry(name: string): Promise<CountryDetail> {
     `https://restcountries.com/v3.1/name/${encodedName}?fullText=true`,
     { next: { revalidate: 86400 } }
   );
-
   if (!res.ok) {
     throw new Error(`Não foi possível encontrar o país: ${name}`);
   }
-
-  const [country] = await res.json();
-  return country;
+  const data = await res.json();
+  if (!data || !data[0]) {
+    throw new Error(`Nenhum dado encontrado para o país: ${name}`);
+  }
+  return data[0];
 }
 
 type PageProps = {
-  params: { name: string };
+  params: { name?: string }; // Made name optional
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateMetadata(
-  { params }: PageProps,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  console.log("Metadata params:", params); // Debug log
+  if (!params.name || params.name.trim() === "") {
+    return {
+      title: "Erro: País não especificado",
+      description: "Nenhum país foi especificado na URL.",
+    };
+  }
   try {
     const country = await getCountry(params.name);
     return {
@@ -66,9 +71,8 @@ export async function generateMetadata(
 }
 
 export default async function CountryPage({ params }: PageProps) {
-  try {
-    const country = await getCountry(params.name);
-
+  console.log("Params received:", params); // Debug log
+  if (!params.name || params.name.trim() === "") {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <Button
@@ -80,15 +84,37 @@ export default async function CountryPage({ params }: PageProps) {
         >
           ← Voltar
         </Button>
+        <Card className="p-4 sm:p-6">
+          <CardHeader>
+            <h1 className="text-2xl font-bold">Erro: País não especificado</h1>
+          </CardHeader>
+          <CardBody>
+            <p>Por favor, especifique um país válido na URL.</p>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
 
+  try {
+    const country = await getCountry(params.name);
+    return (
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <Button
+          as={Link}
+          href="/countries"
+          color="primary"
+          variant="flat"
+          className="mb-4"
+        >
+          ← Voltar
+        </Button>
         <Card className="p-4 sm:p-6">
           <CardHeader className="flex flex-col items-center gap-2">
             <h1 className="text-3xl font-bold">{country.name.common}</h1>
             <h2 className="text-lg text-gray-500">{country.name.official}</h2>
           </CardHeader>
-
           <Divider className="my-4" />
-
           <CardBody>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="flex flex-col items-center">
@@ -100,24 +126,20 @@ export default async function CountryPage({ params }: PageProps) {
                   className="border rounded-lg"
                 />
               </div>
-
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold">Capital</h3>
                   <p>{country.capital?.join(", ") || "Não disponível"}</p>
                 </div>
-
                 <div>
                   <h3 className="font-semibold">População</h3>
                   <p>{country.population.toLocaleString("pt-BR")}</p>
                 </div>
-
                 <div>
                   <h3 className="font-semibold">Região</h3>
                   <p>{country.region}</p>
                   {country.subregion && <p>{country.subregion}</p>}
                 </div>
-
                 {country.currencies && (
                   <div>
                     <h3 className="font-semibold">Moedas</h3>
@@ -130,7 +152,6 @@ export default async function CountryPage({ params }: PageProps) {
                     </div>
                   </div>
                 )}
-
                 {country.languages && (
                   <div>
                     <h3 className="font-semibold">Idiomas</h3>
@@ -159,7 +180,6 @@ export default async function CountryPage({ params }: PageProps) {
         >
           ← Voltar
         </Button>
-
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <h1 className="text-2xl font-bold">Erro ao carregar país</h1>
