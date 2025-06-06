@@ -1,3 +1,5 @@
+// src/app/countries/[name]/page.tsx
+
 import {
   Card,
   CardHeader,
@@ -6,15 +8,11 @@ import {
   Button,
   Divider,
   Image,
-} from "@nextui-org/react";
+} from "@nextui-org/react"; //  <-- Veja a recomendação abaixo sobre isso
 import type { Metadata } from "next";
 import Link from "next/link";
 
-// Props type
-type Props = {
-  params: { name: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
+// REMOVA a definição de 'type Props' daqui.
 
 // Country detail type
 interface CountryDetail {
@@ -48,8 +46,12 @@ async function getCountry(name: string): Promise<CountryDetail> {
   return data[0];
 }
 
-// Metadata generator
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// Metadata generator - CORRIGIDO
+export async function generateMetadata({
+  params,
+}: {
+  params: { name: string };
+}): Promise<Metadata> {
   if (!params.name?.trim()) {
     return {
       title: "Erro: País não especificado",
@@ -71,8 +73,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// Page component
-export default async function CountryPage({ params }: Props) {
+// Page component - CORRIGIDO
+export default async function CountryPage({
+  params,
+}: {
+  params: { name: string };
+}) {
   if (!params.name?.trim()) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
