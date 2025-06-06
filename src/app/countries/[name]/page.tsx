@@ -44,7 +44,7 @@ async function getCountry(name: string): Promise<CountryDetail> {
 }
 
 type PageProps = {
-  params: { name?: string };
+  params: { name: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
