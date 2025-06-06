@@ -4,7 +4,6 @@ import { Card, CardHeader, CardBody, Chip, Button, Divider, Image } from "@nextu
 import type { Metadata } from "next";
 import Link from "next/link";
 
-// Tipagem correta da função assíncrona
 interface CountryDetail {
   name: {
     common: string;
@@ -22,29 +21,27 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
-// Corrigir aqui o fetch
+// ✅ Fetch
 async function getCountry(nome: string): Promise<CountryDetail> {
   const res = await fetch(`https://restcountries.com/v3.1/name/${nome}?fullText=true`, {
     next: { revalidate: 86400 },
   });
-
   if (!res.ok) {
     throw new Error(`Não foi possível encontrar o país: ${nome}`);
   }
-
   const data = await res.json();
   return data[0];
 }
 
-// 👇 TIPAGEM CORRETA para generateMetadata e page
-type PageProps = {
+// ✅ Tipagem correta de props
+type Props = {
   params: {
     nome: string;
   };
 };
 
-// ✅ generateMetadata com tipagem correta
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+// ✅ Metadata
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const country = await getCountry(params.nome);
     return {
@@ -59,8 +56,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-// ✅ Página principal com tipagem correta
-export default async function CountryDetailPage({ params }: PageProps) {
+// ✅ Página principal
+export default async function CountryDetailPage({ params }: Props) {
   const country = await getCountry(params.nome);
 
   return (
