@@ -1,5 +1,3 @@
-// src/app/countries/[name]/page.tsx
-
 import {
   Card,
   CardHeader,
@@ -8,11 +6,9 @@ import {
   Button,
   Divider,
   Image,
-} from "@nextui-org/react"; //  <-- Veja a recomendação abaixo sobre isso
+} from "@nextui-org/react";
 import type { Metadata } from "next";
 import Link from "next/link";
-
-// REMOVA a definição de 'type Props' daqui.
 
 // Country detail type
 interface CountryDetail {
@@ -46,7 +42,7 @@ async function getCountry(name: string): Promise<CountryDetail> {
   return data[0];
 }
 
-// Metadata generator - CORRIGIDO
+// Metadata generator
 export async function generateMetadata({
   params,
 }: {
@@ -73,16 +69,23 @@ export async function generateMetadata({
   }
 }
 
-// Page component - CORRIGIDO
-export default async function CountryPage({
-  params,
-}: {
+// Page component props
+interface CountryPageProps {
   params: { name: string };
-}) {
+}
+
+// Page component
+export default async function CountryPage({ params }: CountryPageProps) {
   if (!params.name?.trim()) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
+        <Button
+          as={Link}
+          href="/countries"
+          color="primary"
+          variant="flat"
+          className="mb-4"
+        >
           ← Voltar
         </Button>
         <Card className="p-4 sm:p-6">
@@ -101,7 +104,13 @@ export default async function CountryPage({
     const country = await getCountry(params.name);
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
+        <Button
+          as={Link}
+          href="/countries"
+          color="primary"
+          variant="flat"
+          className="mb-4"
+        >
           ← Voltar
         </Button>
         <Card className="p-4 sm:p-6">
@@ -133,7 +142,9 @@ export default async function CountryPage({
                 <div>
                   <h3 className="font-semibold">Região</h3>
                   <p>{country.region}</p>
-                  {country.subregion && <p className="text-sm text-gray-500">{country.subregion}</p>}
+                  {country.subregion && (
+                    <p className="text-sm text-gray-500">{country.subregion}</p>
+                  )}
                 </div>
                 {country.currencies && (
                   <div>
@@ -152,7 +163,9 @@ export default async function CountryPage({
                     <h3 className="font-semibold">Idiomas</h3>
                     <div className="flex flex-wrap gap-2">
                       {Object.values(country.languages).map((language) => (
-                        <Chip key={language} variant="solid">{language}</Chip>
+                        <Chip key={language} variant="solid">
+                          {language}
+                        </Chip>
                       ))}
                     </div>
                   </div>
@@ -166,7 +179,13 @@ export default async function CountryPage({
   } catch (error) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
+        <Button
+          as={Link}
+          href="/countries"
+          color="primary"
+          variant="flat"
+          className="mb-4"
+        >
           ← Voltar
         </Button>
         <Card className="p-4 sm:p-6">
@@ -175,7 +194,9 @@ export default async function CountryPage({
           </CardHeader>
           <CardBody>
             <p>O país solicitado não pôde ser encontrado ou ocorreu um erro.</p>
-            {error instanceof Error && <p className="text-sm text-danger-500">{error.message}</p>}
+            {error instanceof Error && (
+              <p className="text-sm text-danger-500">{error.message}</p>
+            )}
           </CardBody>
         </Card>
       </div>
