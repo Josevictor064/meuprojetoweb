@@ -1,26 +1,96 @@
-@import "tailwindcss";
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --foreground-rgb: 17, 24, 39; /* Cinza escuro para texto em modo claro */
+  --background-start-rgb: 243, 244, 246; /* Cinza claro para fundo inicial */
+  --background-end-rgb: 255, 255, 255; /* Branco puro para fundo final */
+  --primary-rgb: 59, 130, 246; /* Azul vibrante para botões e links */
+  --accent-rgb: 139, 92, 246; /* Roxo suave para destaques */
+  --divider-rgb: 229, 231, 235; /* Cinza claro para divisores */
+  --card-bg-rgb: 255, 255, 255; /* Fundo branco para cartões */
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 229, 231, 235; /* Cinza claro para texto em modo escuro */
+    --background-start-rgb: 17, 24, 39; /* Cinza escuro para fundo inicial */
+    --background-end-rgb: 31, 41, 55; /* Cinza mais claro para fundo final */
+    --primary-rgb: 59, 130, 246; /* Mantém azul vibrante */
+    --accent-rgb: 139, 92, 246; /* Mantém roxo suave */
+    --divider-rgb: 55, 65, 81; /* Cinza escuro para divisores */
+    --card-bg-rgb: 31, 41, 55; /* Fundo escuro para cartões */
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 217.2 91.2% 59.8%;
+    --accent: 262.1 83.3% 57.8%;
+    --divider: 220 13% 91%;
+    --card-bg: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --accent: 262.1 83.3% 57.8%;
+    --divider: 217 14% 34%;
+    --card-bg: 222.2 84% 12%;
+  }
+
+  body {
+    @apply bg-gradient-to-b from-[rgb(var(--background-start-rgb))] to-[rgb(var(--background-end-rgb))] text-[rgb(var(--foreground-rgb))];
+    @apply min-h-screen antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-bold tracking-tight;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  .container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply bg-[rgb(var(--card-bg-rgb))] rounded-lg border border-[rgb(var(--divider-rgb))] shadow-[var(--card-shadow)];
+  }
+
+  button, [role="button"] {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  button:hover, [role="button"]:hover {
+    @apply opacity-90;
+  }
+}
+
+@layer utilities {
+  .text-primary {
+    color: rgb(var(--primary-rgb));
+  }
+
+  .text-accent {
+    color: rgb(var(--accent-rgb));
+  }
+
+  .bg-primary {
+    background-color: rgb(var(--primary-rgb));
+  }
+
+  .bg-accent {
+    background-color: rgb(var(--accent-rgb));
+  }
+
+  .border-divider {
+    border-color: rgb(var(--divider-rgb));
+  }
 }

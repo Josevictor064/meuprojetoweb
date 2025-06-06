@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🗺️ Country Explorer
 
-## Getting Started
+Bem-vindo ao Country Explorer! Esta é uma aplicação web construída com Next.js que permite aos usuários explorar informações detalhadas sobre países de todo o mundo. A aplicação consome a [REST Countries API](https://restcountries.com) para obter dados atualizados.
 
-First, run the development server:
+Este projeto foi desenvolvido como uma atividade prática, demonstrando a utilização de tecnologias modernas como Next.js (App Router), TypeScript, e a biblioteca de componentes **HeroUI** (anteriormente NextUI) para criar uma interface de usuário rica e interativa.
+
+## ✨ Features
+
+-   **Autenticação Simulada:** Sistema de login simples para acessar o conteúdo.
+-   **Listagem de Países:** Navegue por uma lista completa de países, apresentada em um layout de grid responsivo.
+-   **Página de Detalhes:** Clique em um país para ver informações detalhadas, como capital, população, região, moedas e idiomas.
+-   **Busca e Geração de Metadados Dinâmicos:** As páginas de detalhes geram títulos e descrições de metadados dinamicamente para melhor SEO.
+-   **Theming Light/Dark:** Suporte para temas claro e escuro, com base nas preferências do sistema do usuário.
+-   **Design Responsivo:** A interface se adapta a diferentes tamanhos de tela, de dispositivos móveis a desktops.
+-   **Carregamento Otimizado:** Utiliza Server Components, `Suspense` e `next/image` para uma experiência de carregamento rápida e eficiente.
+
+## 🚀 Tecnologias Utilizadas
+
+-   **[Next.js](https://nextjs.org/)** - Framework React para produção.
+-   **[React](https://react.dev/)** - Biblioteca para construir interfaces de usuário.
+-   **[TypeScript](https://www.typescriptlang.org/)** - Superset de JavaScript que adiciona tipagem estática.
+-   **[HeroUI](https://heroui.net/)** - Biblioteca de componentes UI bonita e personalizável.
+-   **[Tailwind CSS](https://tailwindcss.com/)** - Framework CSS utility-first para estilização rápida.
+-   **[REST Countries API](https://restcountries.com)** - API pública para obter informações sobre os países.
+
+## 🏁 Como Começar
+
+Siga os passos abaixo para executar o projeto localmente.
+
+### 1. Pré-requisitos
+
+-   [Node.js](https://nodejs.org/en) (versão 18 ou superior)
+-   npm, yarn ou pnpm como gerenciador de pacotes
+
+### 2. Instalação
+
+Primeiro, clone o repositório para a sua máquina:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone [https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git](https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git)
+cd NOME-DO-REPOSITORIO

@@ -1,25 +1,13 @@
 import {
-  Card,
-  CardHeader,
-  CardBody,
-  Chip,
-  Button,
-  Divider,
-  Image,
-} from "@nextui-org/react";
+  Card, CardHeader, CardBody, Chip, Button, Divider, Image,
+} from "@heroui/react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-// Country detail type
 interface CountryDetail {
-  name: {
-    common: string;
-    official: string;
-  };
-  flags: {
-    svg: string;
-    alt?: string;
-  };
+  name: { common: string; official: string };
+  flags: { svg: string; alt?: string };
   capital: string[];
   population: number;
   region: string;
@@ -28,178 +16,109 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
-// Fetch function
-async function getCountry(name: string): Promise<CountryDetail> {
-  const encodedName = encodeURIComponent(name);
+async function getCountry(name: string): Promise<CountryDetail | null> {
+  const decodedName = decodeURIComponent(name);
   const res = await fetch(
-    `https://restcountries.com/v3.1/name/${encodedName}?fullText=true`,
+    `https://restcountries.com/v3.1/name/${decodedName}?fullText=true`,
     { next: { revalidate: 86400 } }
   );
-
-  if (!res.ok) throw new Error(`Não foi possível encontrar o país: ${name}`);
+  if (!res.ok) return null;
   const data = await res.json();
-  if (!data || !data[0]) throw new Error(`Nenhum dado encontrado para: ${name}`);
-  return data[0];
+  return data?.[0] || null;
 }
 
-// Metadata generator
-export async function generateMetadata({
-  params,
-}: {
-  params: { name: string };
-}): Promise<Metadata> {
-  if (!params.name?.trim()) {
-    return {
-      title: "Erro: País não especificado",
-      description: "Nenhum país foi especificado na URL.",
-    };
+export async function generateMetadata({ params }: { params: Promise<{ name: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const country = await getCountry(resolvedParams.name);
+  if (!country) {
+    return { title: "País não encontrado" };
   }
-
-  try {
-    const country = await getCountry(params.name);
-    return {
-      title: `${country.name.common} | Detalhes`,
-      description: `Informações detalhadas sobre ${country.name.common}`,
-    };
-  } catch {
-    return {
-      title: "País não encontrado",
-      description: "Detalhes do país não disponíveis",
-    };
-  }
+  return {
+    title: `${country.name.common} | Detalhes`,
+    description: `Informações detalhadas sobre ${country.name.common}`,
+  };
 }
 
-// Page component props
-interface CountryPageProps {
-  params: { name: string };
+function BackButton() {
+  return (
+    <Button as={Link} href="/countries" color="primary" variant="flat" className="self-start">
+      ← Voltar para a lista
+    </Button>
+  );
 }
 
-// Page component
-export default async function CountryPage({ params }: CountryPageProps) {
-  if (!params.name?.trim()) {
-    return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button
-          as={Link}
-          href="/countries"
-          color="primary"
-          variant="flat"
-          className="mb-4"
-        >
-          ← Voltar
-        </Button>
-        <Card className="p-4 sm:p-6">
-          <CardHeader>
-            <h1 className="text-2xl font-bold">Erro: País não especificado</h1>
-          </CardHeader>
-          <CardBody>
-            <p>Por favor, especifique um país válido na URL.</p>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
-
-  try {
-    const country = await getCountry(params.name);
-    return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button
-          as={Link}
-          href="/countries"
-          color="primary"
-          variant="flat"
-          className="mb-4"
-        >
-          ← Voltar
-        </Button>
-        <Card className="p-4 sm:p-6">
-          <CardHeader className="flex flex-col items-center gap-2">
-            <h1 className="text-3xl font-bold">{country.name.common}</h1>
-            <h2 className="text-lg text-gray-500">{country.name.official}</h2>
-          </CardHeader>
-          <Divider className="my-4" />
-          <CardBody>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="flex flex-col items-center">
-                <Image
-                  src={country.flags.svg}
-                  alt={country.flags.alt || `Bandeira de ${country.name.common}`}
-                  width={320}
-                  height={240}
-                  className="border rounded-lg object-cover"
-                />
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold">Capital</h3>
-                  <p>{country.capital?.join(", ") || "Não disponível"}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold">População</h3>
-                  <p>{country.population.toLocaleString("pt-BR")}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Região</h3>
-                  <p>{country.region}</p>
-                  {country.subregion && (
-                    <p className="text-sm text-gray-500">{country.subregion}</p>
-                  )}
-                </div>
-                {country.currencies && (
-                  <div>
-                    <h3 className="font-semibold">Moedas</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.values(country.currencies).map((currency) => (
-                        <Chip key={currency.name} variant="flat">
-                          {currency.name} ({currency.symbol})
-                        </Chip>
-                      ))}
-                    </div>
-                  </div>
+function CountryDetails({ country }: { country: CountryDetail }) {
+  return (
+    <Card className="card p-4 sm:p-6 w-full">
+      <CardHeader className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-3xl">{country.name.common}</h1>
+        <h2 className="text-lg text-default-500">{country.name.official}</h2>
+      </CardHeader>
+      <Divider className="my-4 border-divider" />
+      <CardBody>
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          <div className="flex flex-col items-center">
+            <Image
+              src={country.flags.svg}
+              alt={country.flags.alt || `Bandeira de ${country.name.common}`}
+              className="border rounded-lg object-cover w-full max-w-sm border-divider"
+            />
+          </div>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold">Capital</h3>
+              <p>{country.capital?.join(", ") || "Não disponível"}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">População</h3>
+              <p>{country.population.toLocaleString("pt-BR")}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Região</h3>
+              <p>
+                {country.region} {country.subregion && (
+                  <span className="text-sm text-default-500">
+                    ({country.subregion})
+                  </span>
                 )}
-                {country.languages && (
-                  <div>
-                    <h3 className="font-semibold">Idiomas</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.values(country.languages).map((language) => (
-                        <Chip key={language} variant="solid">
-                          {language}
-                        </Chip>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Moedas</h3>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {Object.values(country.currencies || {}).map((c) => (
+                  <Chip key={c.name} variant="flat">
+                    {c.name} ({c.symbol})
+                  </Chip>
+                ))}
               </div>
             </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  } catch (error) {
-    return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button
-          as={Link}
-          href="/countries"
-          color="primary"
-          variant="flat"
-          className="mb-4"
-        >
-          ← Voltar
-        </Button>
-        <Card className="p-4 sm:p-6">
-          <CardHeader>
-            <h1 className="text-2xl font-bold">Erro ao carregar país</h1>
-          </CardHeader>
-          <CardBody>
-            <p>O país solicitado não pôde ser encontrado ou ocorreu um erro.</p>
-            {error instanceof Error && (
-              <p className="text-sm text-danger-500">{error.message}</p>
-            )}
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
+            <div>
+              <h3 className="font-semibold">Idiomas</h3>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {Object.values(country.languages || {}).map((lang) => (
+                  <Chip key={lang} variant="solid">
+                    {lang}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+export default async function CountryPage({ params }: { params: Promise<{ name: string }> }) {
+  const resolvedParams = await params;
+  const country = await getCountry(resolvedParams.name);
+  if (!country) notFound();
+
+  return (
+    <div className="container p-4 flex flex-col items-center space-y-6">
+      <BackButton />
+      <CountryDetails country={country} />
+    </div>
+  );
 }

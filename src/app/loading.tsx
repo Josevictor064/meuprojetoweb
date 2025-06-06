@@ -1,11 +1,10 @@
-// app/(pages)/loading.tsx
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@heroui/react";
 
 export default function Loading() {
   return (
     <div className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] gap-4">
       <Spinner size="lg" color="primary" />
-      <p className="text-primary-600 font-medium text-lg animate-pulse">
+      <p className="text-lg font-medium text-primary animate-pulse">
         Explorando o globo...
       </p>
     </div>
