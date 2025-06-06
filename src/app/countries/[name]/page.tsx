@@ -17,7 +17,7 @@ interface CountryDetail {
   };
   flags: {
     svg: string;
-    alt?: string; // Optional to match API response
+    alt?: string;
   };
   capital: string[];
   population: number;
@@ -44,8 +44,8 @@ async function getCountry(name: string): Promise<CountryDetail> {
 }
 
 type PageProps = {
-  params: { name?: string }; // Made name optional
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: { name?: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
