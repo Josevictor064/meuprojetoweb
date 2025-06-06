@@ -7,7 +7,7 @@ import {
   Divider,
   Image,
 } from "@nextui-org/react";
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 
 interface CountryDetail {
@@ -42,12 +42,15 @@ async function getCountry(name: string): Promise<CountryDetail> {
   return country;
 }
 
-interface Props {
+type PageProps = {
   params: { name: string };
   searchParams: { [key: string]: string | string[] | undefined };
-}
+};
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   try {
     const country = await getCountry(params.name);
     return {
@@ -62,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function CountryPage({ params }: Props) {
+export default async function CountryPage({ params }: PageProps) {
   try {
     const country = await getCountry(params.name);
 
