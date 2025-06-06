@@ -48,8 +48,7 @@ type PageProps = {
 };
 
 export async function generateMetadata(
-  { params }: PageProps,
-  parent: ResolvingMetadata
+  { params }: PageProps
 ): Promise<Metadata> {
   try {
     const country = await getCountry(params.name);
@@ -64,6 +63,7 @@ export async function generateMetadata(
     };
   }
 }
+
 
 export default async function CountryPage({ params }: PageProps) {
   try {
