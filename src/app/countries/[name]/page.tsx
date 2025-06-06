@@ -27,44 +27,50 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
-async function getCountry(name: string): Promise<CountryDetail> {
-  const encodedName = encodeURIComponent(name);
+// Função para buscar dados do país
+async function getCountry(nome: string): Promise<CountryDetail> {
+  const encoded = encodeURIComponent(nome);
   const res = await fetch(
-    `https://restcountries.com/v3.1/name/${encodedName}?fullText=true`,
+    `https://restcountries.com/v3.1/name/${encoded}?fullText=true`,
     { next: { revalidate: 86400 } }
   );
 
   if (!res.ok) {
-    throw new Error(`Não foi possível encontrar o país: ${name}`);
+    throw new Error(`Não foi possível encontrar o país: ${nome}`);
   }
 
   const [country] = await res.json();
   return country;
 }
 
-interface Props {
-  params: { nome: string }; // Corrigido para 'nome' para corresponder à pasta [nome]
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// Metadata (corrigido)
+export async function generateMetadata({
+  params,
+}: {
+  params: { nome: string };
+}): Promise<Metadata> {
   try {
-    const country = await getCountry(params.nome); // Alterado para params.nome
+    const country = await getCountry(params.nome);
     return {
       title: `${country.name.common} | Detalhes`,
-      description: `Informações sobre ${country.name.common}`,
+      description: `Informações detalhadas sobre ${country.name.common}.`,
     };
   } catch {
     return {
       title: "País não encontrado",
-      description: "Detalhes do país não disponíveis",
+      description: "Este país não foi encontrado em nossa base de dados.",
     };
   }
 }
 
-export default async function CountryPage({ params }: Props) {
+// Página principal (corrigido)
+export default async function CountryPage({
+  params,
+}: {
+  params: { nome: string };
+}) {
   try {
-    const country = await getCountry(params.nome); // Alterado para params.nome
+    const country = await getCountry(params.nome);
 
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
