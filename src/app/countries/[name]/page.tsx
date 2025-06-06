@@ -10,6 +10,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 
+// Interface for the country data structure from the API
 interface CountryDetail {
   name: {
     common: string;
@@ -27,39 +28,44 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
+// Async function to fetch country data from the REST Countries API
 async function getCountry(name: string): Promise<CountryDetail> {
   const encodedName = encodeURIComponent(name);
   const res = await fetch(
     `https://restcountries.com/v3.1/name/${encodedName}?fullText=true`,
-    { next: { revalidate: 86400 } }
+    { next: { revalidate: 86400 } } // Revalidate data once a day
   );
+
   if (!res.ok) {
     throw new Error(`Não foi possível encontrar o país: ${name}`);
   }
+
   const data = await res.json();
   if (!data || !data[0]) {
     throw new Error(`Nenhum dado encontrado para o país: ${name}`);
   }
+
   return data[0];
 }
 
-type PageProps = {
+// Dynamically generate metadata for the page
+export async function generateMetadata({
+  params,
+}: {
   params: { name: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+}): Promise<Metadata> {
   if (!params.name || params.name.trim() === "") {
     return {
       title: "Erro: País não especificado",
       description: "Nenhum país foi especificado na URL.",
     };
   }
+
   try {
     const country = await getCountry(params.name);
     return {
       title: `${country.name.common} | Detalhes`,
-      description: `Informações sobre ${country.name.common}`,
+      description: `Informações detalhadas sobre ${country.name.common}`,
     };
   } catch {
     return {
@@ -69,17 +75,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function CountryPage({ params }: PageProps) {
+// The main page component
+export default async function CountryPage({
+  params,
+}: {
+  params: { name: string };
+}) {
+  // Handle case where the 'name' parameter is missing
   if (!params.name || params.name.trim() === "") {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button
-          as={Link}
-          href="/countries"
-          color="primary"
-          variant="flat"
-          className="mb-4"
-        >
+        <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
           ← Voltar
         </Button>
         <Card className="p-4 sm:p-6">
@@ -98,13 +104,7 @@ export default async function CountryPage({ params }: PageProps) {
     const country = await getCountry(params.name);
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button
-          as={Link}
-          href="/countries"
-          color="primary"
-          variant="flat"
-          className="mb-4"
-        >
+        <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
           ← Voltar
         </Button>
         <Card className="p-4 sm:p-6">
@@ -121,7 +121,7 @@ export default async function CountryPage({ params }: PageProps) {
                   alt={country.flags.alt || `Bandeira de ${country.name.common}`}
                   width={320}
                   height={240}
-                  className="border rounded-lg"
+                  className="border rounded-lg object-cover"
                 />
               </div>
               <div className="space-y-4">
@@ -136,7 +136,7 @@ export default async function CountryPage({ params }: PageProps) {
                 <div>
                   <h3 className="font-semibold">Região</h3>
                   <p>{country.region}</p>
-                  {country.subregion && <p>{country.subregion}</p>}
+                  {country.subregion && <p className="text-sm text-gray-500">{country.subregion}</p>}
                 </div>
                 {country.currencies && (
                   <div>
@@ -155,7 +155,7 @@ export default async function CountryPage({ params }: PageProps) {
                     <h3 className="font-semibold">Idiomas</h3>
                     <div className="flex flex-wrap gap-2">
                       {Object.values(country.languages).map((language) => (
-                        <Chip key={language}>{language}</Chip>
+                        <Chip key={language} variant="solid">{language}</Chip>
                       ))}
                     </div>
                   </div>
@@ -166,16 +166,11 @@ export default async function CountryPage({ params }: PageProps) {
         </Card>
       </div>
     );
-  } catch {
+  } catch (error) {
+    // Handle errors during data fetching (e.g., country not found)
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <Button
-          as={Link}
-          href="/countries"
-          color="primary"
-          variant="flat"
-          className="mb-4"
-        >
+        <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
           ← Voltar
         </Button>
         <Card className="p-4 sm:p-6">
@@ -183,7 +178,8 @@ export default async function CountryPage({ params }: PageProps) {
             <h1 className="text-2xl font-bold">Erro ao carregar país</h1>
           </CardHeader>
           <CardBody>
-            <p>O país solicitado não pôde ser carregado.</p>
+            <p>O país solicitado não pôde ser encontrado ou ocorreu um erro.</p>
+            {error instanceof Error && <p className="text-sm text-danger-500">{error.message}</p>}
           </CardBody>
         </Card>
       </div>
