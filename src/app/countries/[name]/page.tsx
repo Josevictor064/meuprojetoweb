@@ -30,26 +30,25 @@ interface CountryDetail {
 async function getCountry(name: string): Promise<CountryDetail> {
   const encodedName = encodeURIComponent(name);
   const res = await fetch(
-    `https://restcountries.com/v3.1/name/${encodedName}?fullText=true`,
+    https://restcountries.com/v3.1/name/${encodedName}?fullText=true,
     { next: { revalidate: 86400 } }
   );
   if (!res.ok) {
-    throw new Error(`Não foi possível encontrar o país: ${name}`);
+    throw new Error(Não foi possível encontrar o país: ${name});
   }
   const data = await res.json();
   if (!data || !data[0]) {
-    throw new Error(`Nenhum dado encontrado para o país: ${name}`);
+    throw new Error(Nenhum dado encontrado para o país: ${name});
   }
   return data[0];
 }
 
 type PageProps = {
-  params: { name: string };
+  params: { name: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  console.log("Metadata params:", params); // Debug log
   if (!params.name || params.name.trim() === "") {
     return {
       title: "Erro: País não especificado",
@@ -59,8 +58,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const country = await getCountry(params.name);
     return {
-      title: `${country.name.common} | Detalhes`,
-      description: `Informações sobre ${country.name.common}`,
+      title: ${country.name.common} | Detalhes,
+      description: Informações sobre ${country.name.common},
     };
   } catch {
     return {
@@ -71,7 +70,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CountryPage({ params }: PageProps) {
-  console.log("Params received:", params); // Debug log
   if (!params.name || params.name.trim() === "") {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -120,7 +118,7 @@ export default async function CountryPage({ params }: PageProps) {
               <div className="flex flex-col items-center">
                 <Image
                   src={country.flags.svg}
-                  alt={country.flags.alt || `Bandeira de ${country.name.common}`}
+                  alt={country.flags.alt || Bandeira de ${country.name.common}}
                   width={320}
                   height={240}
                   className="border rounded-lg"
@@ -189,6 +187,6 @@ export default async function CountryPage({ params }: PageProps) {
           </CardBody>
         </Card>
       </div>
-    );
-  }
+    );
+  }
 }
