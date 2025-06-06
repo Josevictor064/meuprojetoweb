@@ -9,7 +9,7 @@ interface CountryDetail {
   };
   flags: {
     svg: string;
-    alt?: string;
+    alt: string;
   };
   capital: string[];
   population: number;
@@ -19,28 +19,26 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
-// Fetch
-async function getCountry(nome: string): Promise<CountryDetail> {
-  const res = await fetch(`https://restcountries.com/v3.1/name/${nome}?fullText=true`, {
+async function getCountry(name: string): Promise<CountryDetail> {
+  const res = await fetch(`https://restcountries.com/v3.1/name/${name}?fullText=true`, {
     next: { revalidate: 86400 },
   });
   if (!res.ok) {
-    throw new Error(`Não foi possível encontrar o país: ${nome}`);
+    throw new Error(`Não foi possível encontrar o país: ${name}`);
   }
   const data = await res.json();
   return data[0];
 }
 
-// Tipagem correta de props
 type Props = {
-  params: Promise<{ nome: string }>;
+  params: {
+    name: string;
+  };
 };
 
-// Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { nome } = await params; // Resolve o Promise
   try {
-    const country = await getCountry(nome);
+    const country = await getCountry(params.name);
     return {
       title: `${country.name.common} | Detalhes`,
       description: `Informações detalhadas sobre ${country.name.common}.`,
@@ -53,10 +51,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// Página principal
 export default async function CountryDetailPage({ params }: Props) {
-  const { nome } = await params; // Resolve o Promise
-  const country = await getCountry(nome);
+  const country = await getCountry(params.name);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -77,27 +73,23 @@ export default async function CountryDetailPage({ params }: Props) {
               className="rounded-lg shadow-md w-full"
             />
             <div className="space-y-4">
-              <p><strong>Capital:</strong> {country.capital?.join(", ") || "N/A"}</p>
-              <p><strong>População:</strong> {country.population.toLocaleString("pt-BR")}</p>
+              <p><strong>Capital:</strong> {country.capital?.join(', ') || 'N/A'}</p>
+              <p><strong>População:</strong> {country.population.toLocaleString('pt-BR')}</p>
               <p><strong>Continente:</strong> {country.region}</p>
               <p><strong>Sub-região:</strong> {country.subregion}</p>
               <div>
                 <strong>Moedas:</strong>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {Object.values(country.currencies || {}).map((c) => (
-                    <Chip key={c.name} variant="flat">
-                      {c.name} ({c.symbol})
-                    </Chip>
+                  {Object.values(country.currencies || {}).map(c => (
+                    <Chip key={c.name} variant="flat">{c.name} ({c.symbol})</Chip>
                   ))}
                 </div>
               </div>
               <div>
                 <strong>Idiomas:</strong>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {Object.values(country.languages || {}).map((lang) => (
-                    <Chip key={lang} variant="flat">
-                      {lang}
-                    </Chip>
+                  {Object.values(country.languages || {}).map(lang => (
+                    <Chip key={lang} variant="flat">{lang}</Chip>
                   ))}
                 </div>
               </div>
