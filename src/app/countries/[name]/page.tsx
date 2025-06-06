@@ -42,14 +42,14 @@ async function getCountry(name: string): Promise<CountryDetail> {
   return country;
 }
 
-interface PageProps {
-  params: { name: string };
+interface Props {
+  params: { nome: string }; // Corrigido para 'nome' para corresponder à pasta [nome]
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const country = await getCountry(params.name);
+    const country = await getCountry(params.nome); // Alterado para params.nome
     return {
       title: `${country.name.common} | Detalhes`,
       description: `Informações sobre ${country.name.common}`,
@@ -62,9 +62,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function CountryPage({ params }: PageProps) {
+export default async function CountryPage({ params }: Props) {
   try {
-    const country = await getCountry(params.name);
+    const country = await getCountry(params.nome); // Alterado para params.nome
 
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
