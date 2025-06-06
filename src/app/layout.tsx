@@ -35,8 +35,6 @@ export default function RootLayout({
     window.location.href = '/'; 
   };
   
-  const isLoginPage = pathname === '/';
-
   const menuItems = [
     { label: "Países", href: "/countries", show: (isClientMounted && isLoggedIn) },
   ];
