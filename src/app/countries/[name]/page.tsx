@@ -7,7 +7,7 @@ import {
   Divider,
   Image,
 } from "@nextui-org/react";
-import type { Metadata, ResolvingMetadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 interface CountryDetail {
