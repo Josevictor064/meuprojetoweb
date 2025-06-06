@@ -1,7 +1,10 @@
+// src/app/países/[nome]/page.tsx
+
 import { Card, CardHeader, CardBody, Chip, Button, Divider, Image } from "@nextui-org/react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+// Tipagem correta da função assíncrona
 interface CountryDetail {
   name: {
     common: string;
@@ -19,25 +22,29 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
+// Corrigir aqui o fetch
 async function getCountry(nome: string): Promise<CountryDetail> {
   const res = await fetch(`https://restcountries.com/v3.1/name/${nome}?fullText=true`, {
     next: { revalidate: 86400 },
   });
+
   if (!res.ok) {
     throw new Error(`Não foi possível encontrar o país: ${nome}`);
   }
+
   const data = await res.json();
   return data[0];
 }
 
-// Tipagem correta
-type Props = {
+// 👇 TIPAGEM CORRETA para generateMetadata e page
+type PageProps = {
   params: {
     nome: string;
   };
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// ✅ generateMetadata com tipagem correta
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const country = await getCountry(params.nome);
     return {
@@ -52,7 +59,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function CountryDetailPage({ params }: Props) {
+// ✅ Página principal com tipagem correta
+export default async function CountryDetailPage({ params }: PageProps) {
   const country = await getCountry(params.nome);
 
   return (
@@ -81,16 +89,20 @@ export default async function CountryDetailPage({ params }: Props) {
               <div>
                 <strong>Moedas:</strong>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {Object.values(country.currencies || {}).map(c => (
-                    <Chip key={c.name} variant="flat">{c.name} ({c.symbol})</Chip>
+                  {Object.values(country.currencies || {}).map((c) => (
+                    <Chip key={c.name} variant="flat">
+                      {c.name} ({c.symbol})
+                    </Chip>
                   ))}
                 </div>
               </div>
               <div>
                 <strong>Idiomas:</strong>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {Object.values(country.languages || {}).map(lang => (
-                    <Chip key={lang} variant="flat">{lang}</Chip>
+                  {Object.values(country.languages || {}).map((lang) => (
+                    <Chip key={lang} variant="flat">
+                      {lang}
+                    </Chip>
                   ))}
                 </div>
               </div>
