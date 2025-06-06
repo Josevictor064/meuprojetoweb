@@ -10,7 +10,13 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 
-// Interface for the country data structure from the API
+// Props type
+type Props = {
+  params: { name: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+// Country detail type
 interface CountryDetail {
   name: {
     common: string;
@@ -28,33 +34,23 @@ interface CountryDetail {
   currencies: { [key: string]: { name: string; symbol: string } };
 }
 
-// Async function to fetch country data from the REST Countries API
+// Fetch function
 async function getCountry(name: string): Promise<CountryDetail> {
   const encodedName = encodeURIComponent(name);
   const res = await fetch(
     `https://restcountries.com/v3.1/name/${encodedName}?fullText=true`,
-    { next: { revalidate: 86400 } } // Revalidate data once a day
+    { next: { revalidate: 86400 } }
   );
 
-  if (!res.ok) {
-    throw new Error(`Não foi possível encontrar o país: ${name}`);
-  }
-
+  if (!res.ok) throw new Error(`Não foi possível encontrar o país: ${name}`);
   const data = await res.json();
-  if (!data || !data[0]) {
-    throw new Error(`Nenhum dado encontrado para o país: ${name}`);
-  }
-
+  if (!data || !data[0]) throw new Error(`Nenhum dado encontrado para: ${name}`);
   return data[0];
 }
 
-// Dynamically generate metadata for the page
-export async function generateMetadata({
-  params,
-}: {
-  params: { name: string };
-}): Promise<Metadata> {
-  if (!params.name || params.name.trim() === "") {
+// Metadata generator
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  if (!params.name?.trim()) {
     return {
       title: "Erro: País não especificado",
       description: "Nenhum país foi especificado na URL.",
@@ -75,14 +71,9 @@ export async function generateMetadata({
   }
 }
 
-// The main page component
-export default async function CountryPage({
-  params,
-}: {
-  params: { name: string };
-}) {
-  // Handle case where the 'name' parameter is missing
-  if (!params.name || params.name.trim() === "") {
+// Page component
+export default async function CountryPage({ params }: Props) {
+  if (!params.name?.trim()) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
@@ -167,7 +158,6 @@ export default async function CountryPage({
       </div>
     );
   } catch (error) {
-    // Handle errors during data fetching (e.g., country not found)
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <Button as={Link} href="/countries" color="primary" variant="flat" className="mb-4">
