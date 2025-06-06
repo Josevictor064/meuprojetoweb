@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardHeader,
@@ -50,7 +49,7 @@ type PageProps = {
 
 export async function generateMetadata(
   { params }: PageProps,
-  // Removido 'parent: ResolvingMetadata' pois não está sendo utilizado
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   try {
     const country = await getCountry(params.name);
@@ -170,6 +169,6 @@ export default async function CountryPage({ params }: PageProps) {
           </CardBody>
         </Card>
       </div>
-    );
-  }
+    );
+  }
 }
